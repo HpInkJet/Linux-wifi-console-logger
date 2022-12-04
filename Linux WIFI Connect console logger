@@ -1,0 +1,36 @@
+import argparse
+import os
+from scapy.all import *
+
+# Create a function to scan the network for new devices
+def scan_network(network):
+  # Get a list of all devices currently on the network
+  current_devices = []
+  for device in network:
+    current_devices.append(device.addr)
+
+  # Compare the current list of devices with the previously-scanned list
+  for device in current_devices:
+    if device not in previously_scanned_devices:
+      # Send a notification to the Linux console
+      os.system('echo "New device detected: {}"'.format(device))
+      # Add the new device to the previously-scanned list
+      previously_scanned_devices.append(device)
+
+# Use argparse to create a command-line interface
+parser = argparse.ArgumentParser()
+parser.add_argument('-n', '--network', help='The name of the network to scan')
+parser.add_argument('-i', '--interval', help='The scan interval in seconds')
+args = parser.parse_args()
+
+# Set the network and scan interval
+network_name = args.network
+scan_interval = args.interval
+
+# Create a list to store previously-scanned devices
+previously_scanned_devices = []
+
+# Continuously scan the network at the specified interval
+while True:
+  scan_network(network_name)
+  time.sleep(scan_interval)
